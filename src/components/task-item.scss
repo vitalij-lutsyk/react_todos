@@ -1,0 +1,67 @@
+.task {
+  &__item {
+    display: grid;
+    grid-template-columns: 10% auto;
+    border: 1px rgba(0, 0, 0, 0.2) solid;
+    border-radius: 10px;
+    box-shadow: 0 0 3px;
+    margin: 10px 0;
+    width: 100%;
+    position: relative;
+    padding: 5px;
+  }
+  &__item:hover {
+    background-color: rgba(128, 128, 128, 0.1);
+  }
+  &__item--done {
+    text-decoration-line: line-through;
+    text-decoration-color: gray;
+  }
+  &__mark {
+    margin: auto 25%;
+  }
+  &__body {
+    margin: auto 0;
+    padding: 2px 5px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    line-height: 23px;
+    vertical-align: middle;
+    font-size: 20px;
+    font-weight: 100;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+  }
+  &__editor {
+    width: 100%;
+    min-height: 30px;
+    border: 0.5px solid rgba(0, 0, 0, 0);
+    background-color: none;
+    box-shadow: 0 0 3px;
+    border-radius: 4px;
+    padding: 0 5px;
+    line-height: 20px;
+    vertical-align: middle;
+    font-style: italic;
+  }
+  &__title {
+    color: black;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  &__btns {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    background: none;
+  }
+  &__btn {
+    background: none;
+    color: black;
+    padding: auto;
+  }
+  &__btn:hover {
+    color: green;
+  }
+}
+
