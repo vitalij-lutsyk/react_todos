@@ -15,31 +15,48 @@ class TodoList extends Component {
 
   // Work with API
   fetchTodos = () => {
-    API.get('.json').then(res => {
-      let data = Object.keys(res.data).map(id => {
-        return {
-          id: id,
-          isDone:res.data[id].done,
-          title: res.data[id].title
+    API.get('.json')
+      .then(res => {
+        if (!res.data) return
+        else {
+          let data = Object.keys(res.data).map(id => {
+            return {
+              id: id,
+              isDone:res.data[id].done,
+              title: res.data[id].title
+            }
+          })
+          this.setState({ todoItems: data })
+          this.calculateLeftTasks()
         }
       })
-      this.setState({ todoItems: data })
-      this.calculateLeftTasks()
-    })
+      .catch(err => { console.log(err) })
   }
 
   updateTask = (id, title = '', isDone = false) => {
     let updatingTask = { title: title, done: isDone }
-    API.put(`${id}.json`, updatingTask).then(() => { this.fetchTodos() })
+    API.put(`${id}/.json`, updatingTask).then(() => {
+      const updatedTodos = this.state.todoItems.map(todo => todo.id === id ? updatingTask : todo)
+      this.setState({ todoItems: updatedTodos })
+      this.calculateLeftTasks()
+    })
     this.changeEditMode()
   }
 
   deleteTask = (id) => {
-    API.delete(`${id}.json`).then(() => { this.fetchTodos() })
+    API.delete(`${id}/.json`).then(() => {
+      const updatedTodos = this.state.todoItems.filter(todo => todo.id !== id)
+      this.setState({ todoItems: updatedTodos })
+      this.calculateLeftTasks()
+    })
   }
 
   createNewTask = (newTask) => {
-    API.post('.json', newTask).then(() => { this.fetchTodos() })
+    API.post('.json', newTask).then((res) => {
+      const updatedTodos = this.state.todoItems.concat({ id: res.data.name, ...newTask })
+      this.setState({ todoItems: updatedTodos })
+      this.calculateLeftTasks()
+    })
   }
 
   // Local controls
@@ -59,7 +76,11 @@ class TodoList extends Component {
   }
 
   calculateLeftTasks = () => {
-    this.setState({ leftTasks: this.state.todoItems.filter((item) => !item.isDone).length})
+    if (this.state.todoItems.length) {
+      this.setState({ leftTasks: this.state.todoItems.filter((item) => !item.isDone).length})
+    } else {
+      this.setState({ leftTasks: 0 })
+    }
   }
 
   // Fetching todos when page is start
