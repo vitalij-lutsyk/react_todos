@@ -22,7 +22,7 @@ class TodoList extends Component {
           let data = Object.keys(res.data).map(id => {
             return {
               id: id,
-              isDone:res.data[id].done,
+              done:res.data[id].done,
               title: res.data[id].title
             }
           })
@@ -33,10 +33,9 @@ class TodoList extends Component {
       .catch(err => { console.log(err) })
   }
 
-  updateTask = (id, title = '', isDone = false) => {
-    let updatingTask = { title: title, done: isDone }
-    API.put(`${id}/.json`, updatingTask).then(() => {
-      const updatedTodos = this.state.todoItems.map(todo => todo.id === id ? updatingTask : todo)
+  updateTask = (id, title = '', done = false) => {
+    API.put(`${id}/.json`, { title, done }).then(res => {
+      const updatedTodos = this.state.todoItems.map(todo => todo.id === id ? { id, ...res.data } : todo)
       this.setState({ todoItems: updatedTodos })
       this.calculateLeftTasks()
     })
@@ -52,7 +51,7 @@ class TodoList extends Component {
   }
 
   createNewTask = (newTask) => {
-    API.post('.json', newTask).then((res) => {
+    API.post('/.json', newTask).then((res) => {
       const updatedTodos = this.state.todoItems.concat({ id: res.data.name, ...newTask })
       this.setState({ todoItems: updatedTodos })
       this.calculateLeftTasks()
@@ -77,7 +76,7 @@ class TodoList extends Component {
 
   calculateLeftTasks = () => {
     if (this.state.todoItems.length) {
-      this.setState({ leftTasks: this.state.todoItems.filter((item) => !item.isDone).length})
+      this.setState({ leftTasks: this.state.todoItems.filter((item) => !item.done).length})
     } else {
       this.setState({ leftTasks: 0 })
     }
@@ -91,7 +90,7 @@ class TodoList extends Component {
   render() {
     const items = this.state.todoItems.map((item, index) => {
       const domItem = <TodoItem title={item.title}
-                                isDone={item.isDone}
+                                done={item.done}
                                 id={item.id}
                                 idx={index}
                                 isEditMode={this.state.isEditMode}
@@ -102,8 +101,8 @@ class TodoList extends Component {
                                 update={this.updateTask}
                                 delete={() => this.deleteTask(item.id)}
                                 key={index}/>
-      if (this.state.visibleTasks === 'done' && item.isDone) return domItem
-      if (this.state.visibleTasks === 'act' && !item.isDone) return domItem
+      if (this.state.visibleTasks === 'done' && item.done) return domItem
+      if (this.state.visibleTasks === 'act' && !item.done) return domItem
       if (this.state.visibleTasks === 'all') return domItem
       else return null
     })
