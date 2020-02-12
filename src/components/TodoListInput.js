@@ -2,35 +2,37 @@ import React, { Component } from 'react';
 
 class TodoInput extends Component {
   state = {
-    newTask: { title: '', done: false }
+    newTask: ''
   };
-  changeNewTask = event => {
-    let updatedNewTask = Object.assign({}, this.state.newTask);
-    updatedNewTask.title = event.target.value;
-    this.setState({ newTask: updatedNewTask });
-  };
-  createNewTask = () => {
-    this.props.create(this.state.newTask);
-    this.setState({ newTask: { title: '', done: false } });
-  };
-  render() {
-    let btnStyle = 'new-task__buttonSubmit';
 
-    if (this.state.newTask.title.length > 1) {
-      btnStyle = 'new-task__buttonSubmit new-task__buttonSubmit__active';
-    } else btnStyle = 'new-task__buttonSubmit';
+  get isDisabled() {
+    return this.state.newTask.length < 6;
+  }
+
+  handleChangeNewTask = event => {
+    this.setState({ newTask: event.target.value });
+  };
+
+  createNewTask(e = null) {
+    if (e.key !== 'Enter' || this.isDisabled) return;
+    this.props.create({ title: this.state.newTask, done: false });
+    this.setState({ newTask: '' });
+  }
+
+  render() {
     return (
       <div className="new-task">
         <input
           type="text"
           className="new-task__editor"
-          value={this.state.newTask.title}
-          onChange={event => this.changeNewTask(event)}
+          value={this.state.newTask}
+          onChange={this.handleChangeNewTask}
+          onKeyPress={e => this.createNewTask(e)}
         />
         <button
-          className={btnStyle}
-          onClick={() => this.createNewTask()}
-          disabled={this.state.newTask.title.length < 2}
+          className="new-task__button-submit"
+          onClick={this.createNewTask}
+          disabled={this.isDisabled}
         >
           <i className="fas fa-plus"></i>
         </button>
