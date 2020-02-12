@@ -1,8 +1,13 @@
 /* Utils files ----------------------------------------
 ----------------------------------------------------- */
-@import "utils/_variables";
+@import 'utils/_variables';
 
 /* Base files ----------------------------------------
  ----------------------------------------------------- */
-@import "base/_normalize";
-@import "base/_base";
+@import 'base/_normalize';
+@import 'base/_base';
+
+// Components
+@import 'components/_task-list';
+@import 'components/_task-item';
+@import 'components/_task-input';

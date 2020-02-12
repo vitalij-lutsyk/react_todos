@@ -59,7 +59,6 @@ a:active {
 }
 
 a {
-
   &:hover,
   &:focus {
     text-decoration: none;
@@ -103,26 +102,31 @@ h1 {
   font-size: 2.6rem;
 }
 
-h2, .text-heading2 {
+h2,
+.text-heading2 {
   font-size: 1.73rem;
   @media (max-width: 767px) {
     font-size: 1.33rem !important;
   }
 }
 
-h3, .text-heading3 {
+h3,
+.text-heading3 {
   font-size: 1.46rem;
 }
 
-h4, .text-heading4 {
+h4,
+.text-heading4 {
   font-size: 1.33rem;
 }
 
-h5, .text-heading5 {
+h5,
+.text-heading5 {
   font-size: 1.2rem;
 }
 
-h6, .text-heading6 {
+h6,
+.text-heading6 {
   font-size: 1rem;
 }
 
