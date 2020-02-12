@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import API from '../api/api.js';
 
 class TodoInput extends Component {
   state = {
     newTask: ''
   };
 
-  get isDisabled() {
+  get isUnValid() {
     return this.state.newTask.length < 6;
   }
 
@@ -13,11 +14,18 @@ class TodoInput extends Component {
     this.setState({ newTask: event.target.value });
   };
 
-  createNewTask(e = null) {
-    if (e.key !== 'Enter' || this.isDisabled) return;
-    this.props.create({ title: this.state.newTask, done: false });
-    this.setState({ newTask: '' });
-  }
+  handleCreateNewTask = (e = null) => {
+    if (e.key !== 'Enter' || this.isUnValid) return;
+    this.createNewTask({ title: this.state.newTask, done: false });
+  };
+
+  createNewTask = newTask => {
+    API.post('/.json', newTask).then(res => {
+      const newTodo = { id: res.data.name, ...newTask };
+      this.props.added(newTodo);
+      this.setState({ newTask: '' });
+    });
+  };
 
   render() {
     return (
@@ -27,13 +35,9 @@ class TodoInput extends Component {
           className="new-task__editor"
           value={this.state.newTask}
           onChange={this.handleChangeNewTask}
-          onKeyPress={e => this.createNewTask(e)}
+          onKeyPress={this.handleCreateNewTask}
         />
-        <button
-          className="new-task__button-submit"
-          onClick={this.createNewTask}
-          disabled={this.isDisabled}
-        >
+        <button className="new-task__button-submit" onClick={this.handleCreateNewTask} disabled={this.isUnValid}>
           <i className="fas fa-plus"></i>
         </button>
       </div>

@@ -1,0 +1,17 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  &__left-tasks {
+    margin: auto 0;
+  }
+  &__btn {
+    margin: 5px;
+    border: 1px solid yellowgreen;
+    padding: 5px;
+    border-radius: 5px;
+    &.is-active {
+      box-shadow: 0 0 5px;
+      background-color: rgba(153, 205, 50, 0.2);
+    }
+  }
+}

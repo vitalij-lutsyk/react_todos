@@ -1,81 +1,90 @@
 import React, { Component } from 'react';
+import API from '../api/api.js';
 
 class TodoItem extends Component {
-  constructor(props) {
-    super(props);
-    this.handleChange = this.handleChange.bind(this);
+  state = {};
+
+  componentDidMount() {
+    this.setState({ ...this.props.item, isEditing: false });
   }
 
-  handleChange(event) {
-    this.props.inputChanged(event);
+  handleStartEditing = () => {
+    this.setState({ titleBackup: this.state.title });
+    this.setState({ isEditing: true });
+  };
+
+  handleEdit = e => {
+    this.setState({ title: e.target.value });
+  };
+
+  handleSave = () => {
+    const { id, title, done } = this.state;
+    this.updateTask(id, title, done);
+  };
+
+  handleDiscard = () => {
+    this.setState({ isEditing: false, title: this.state.titleBackup });
+  };
+
+  handleDone = e => {
+    const { id, title } = this.state;
+    this.updateTask(id, title, e.target.checked);
+  };
+
+  updateTask = (id, title = '', done = false) => {
+    API.put(`${id}/.json`, { title, done }).then(res => {
+      this.props.updated({ id, ...res.data });
+      this.setState({ ...res.data, isEditing: false });
+    });
+  };
+
+  deleteTask = () => {
+    API.delete(`${this.state.id}/.json`).then(() => {
+      this.props.deleted(this.state.id);
+    });
+  };
+
+  get todoBody() {
+    if (this.state.isEditing) {
+      return <input type="text" className="task__editor" value={this.state.title} onChange={this.handleEdit} />;
+    } else {
+      return <p>{this.state.title}</p>;
+    }
+  }
+
+  get todoBtns() {
+    if (this.state.isEditing) {
+      return (
+        <>
+          <button className="task__btn" onClick={this.handleSave}>
+            <i className="far fa-save"></i>
+          </button>
+          <button className="task__btn" onClick={this.handleDiscard}>
+            <i className="fas fa-ban"></i>
+          </button>
+        </>
+      );
+    } else {
+      return (
+        <button className="task__btn" onClick={this.handleStartEditing}>
+          <i className="far fa-edit"></i>
+        </button>
+      );
+    }
   }
 
   render() {
-    // Prepared templates
-    const itemTitle = <p>{this.props.title}</p>,
-      itemCheckbox = (
-        <input
-          type="checkbox"
-          className="task__mark"
-          checked={this.props.done}
-          onChange={() => this.props.update(this.props.id, this.props.title, !this.props.done)}
-        />
-      ),
-      itemInput = (
-        <input
-          type="text"
-          className="task__editor"
-          value={this.props.activeEditItemValue}
-          onChange={this.handleChange}
-        />
-      ),
-      itemBtnEdit = (
-        <button
-          className="task__btn"
-          onClick={() => this.props.changeEditMode(true, this.props.idx)}
-        >
-          <i className="far fa-edit"></i>
-        </button>
-      ),
-      itemBtnSave = (
-        <button
-          className="task__btn"
-          onClick={() =>
-            this.props.update(this.props.id, this.props.activeEditItemValue, this.props.done)
-          }
-        >
-          <i className="far fa-save"></i>
-        </button>
-      ),
-      itemBtnDiscard = (
-        <button className="task__btn" onClick={() => this.props.changeEditMode()}>
-          <i className="fas fa-ban"></i>
-        </button>
-      ),
-      itemBtnDelete = (
-        <button className="task__btn" onClick={this.props.delete}>
-          <i className="fas fa-trash"></i>
-        </button>
-      );
-
-    // Switcher of buttons & input
-    let itemBody = null,
-      itemButtons = null;
-    if (this.props.isEditMode && this.props.idx === this.props.activeEditItem) {
-      itemBody = itemInput;
-      itemButtons = [itemBtnSave, itemBtnDiscard, itemBtnDelete];
-    } else {
-      itemBody = itemTitle;
-      itemButtons = [itemBtnEdit, itemBtnDelete];
-    }
-
-    // Final rendering
     return (
       <div className="task__item">
-        {itemCheckbox}
+        <input type="checkbox" className="task__mark" checked={this.state.done || false} onChange={this.handleDone} />
         <div className="task__body">
-          {itemBody}
-          <div className="task__btns">{itemButtons}</div>
+          {this.todoBody}
+          <div className="task__btns">
+            {this.todoBtns}
+            <button className="task__btn" onClick={this.deleteTask}>
+              <i className="fas fa-trash"></i>
+            </button>
+          </div>
         </div>
       </div>
     );
