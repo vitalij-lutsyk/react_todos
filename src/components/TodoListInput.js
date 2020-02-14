@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import API from '../api/api.js';
+import { connect } from 'react-redux';
+
+import { addNewTask } from '../store/actions/todosActions';
 
 class TodoInput extends Component {
   state = {
@@ -16,13 +18,7 @@ class TodoInput extends Component {
 
   handleCreateNewTask = (e = null) => {
     if (e.key !== 'Enter' || this.isUnValid) return;
-    this.createNewTask({ title: this.state.newTask, done: false });
-  };
-
-  createNewTask = newTask => {
-    API.post('/.json', newTask).then(res => {
-      const newTodo = { id: res.data.name, ...newTask };
-      this.props.added(newTodo);
+    this.props.addNewTask({ title: this.state.newTask, done: false }).then(() => {
       this.setState({ newTask: '' });
     });
   };
@@ -45,4 +41,4 @@ class TodoInput extends Component {
   }
 }
 
-export default TodoInput;
+export default connect(null, { addNewTask })(TodoInput);

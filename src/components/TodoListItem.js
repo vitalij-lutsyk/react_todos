@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import API from '../api/api.js';
+import { connect } from 'react-redux';
+
+import { updateTask, deleteTask } from '../store/actions/todosActions';
 
 class TodoItem extends Component {
   state = {};
 
   componentDidMount() {
-    this.setState({ ...this.props.item, isEditing: false });
+    this.setState({ ...this.props.item });
   }
 
   handleStartEditing = () => {
@@ -19,7 +21,9 @@ class TodoItem extends Component {
 
   handleSave = () => {
     const { id, title, done } = this.state;
-    this.updateTask(id, title, done);
+    this.props.updateTask(id, title, done).then(updateTask => {
+      this.setState({ ...updateTask });
+    });
   };
 
   handleDiscard = () => {
@@ -28,27 +32,18 @@ class TodoItem extends Component {
 
   handleDone = e => {
     const { id, title } = this.state;
-    this.updateTask(id, title, e.target.checked);
+    this.props.updateTask(id, title, e.target.checked);
   };
 
-  updateTask = (id, title = '', done = false) => {
-    API.put(`${id}/.json`, { title, done }).then(res => {
-      this.props.updated({ id, ...res.data });
-      this.setState({ ...res.data, isEditing: false });
-    });
-  };
-
-  deleteTask = () => {
-    API.delete(`${this.state.id}/.json`).then(() => {
-      this.props.deleted(this.state.id);
-    });
+  handleDelete = () => {
+    this.props.deleteTask(this.state.id);
   };
 
   get todoBody() {
     if (this.state.isEditing) {
       return <input type="text" className="task__editor" value={this.state.title} onChange={this.handleEdit} />;
     } else {
-      return <p>{this.state.title}</p>;
+      return <p>{this.props.item.title}</p>;
     }
   }
 
@@ -76,12 +71,17 @@ class TodoItem extends Component {
   render() {
     return (
       <div className="task__item">
-        <input type="checkbox" className="task__mark" checked={this.state.done || false} onChange={this.handleDone} />
+        <input
+          type="checkbox"
+          className="task__mark"
+          checked={this.props.item.done || false}
+          onChange={this.handleDone}
+        />
         <div className="task__body">
           {this.todoBody}
           <div className="task__btns">
             {this.todoBtns}
-            <button className="task__btn" onClick={this.deleteTask}>
+            <button className="task__btn" onClick={this.handleDelete}>
               <i className="fas fa-trash"></i>
             </button>
           </div>
@@ -91,4 +91,4 @@ class TodoItem extends Component {
   }
 }
 
-export default TodoItem;
+export default connect(null, { updateTask, deleteTask })(TodoItem);

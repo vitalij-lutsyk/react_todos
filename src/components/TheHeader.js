@@ -1,4 +1,7 @@
 import React from 'react';
+import { connect } from 'react-redux';
+
+import { changeVisibleTasks } from '../store/actions/todosActions';
 
 const TheHeader = props => {
   function getStyle(target) {
@@ -11,13 +14,13 @@ const TheHeader = props => {
         <p>{props.leftTasks}</p>
       </div>
       <div className="header_btns">
-        <button onClick={() => props.update('all')} className={getStyle('all')}>
+        <button onClick={() => props.changeVisibleTasks('all')} className={getStyle('all')}>
           All
         </button>
-        <button onClick={() => props.update('act')} className={getStyle('act')}>
+        <button onClick={() => props.changeVisibleTasks('act')} className={getStyle('act')}>
           Active
         </button>
-        <button onClick={() => props.update('done')} className={getStyle('done')}>
+        <button onClick={() => props.changeVisibleTasks('done')} className={getStyle('done')}>
           Complited
         </button>
       </div>
@@ -25,4 +28,4 @@ const TheHeader = props => {
   );
 };
 
-export default TheHeader;
+export default connect(null, { changeVisibleTasks })(TheHeader);
